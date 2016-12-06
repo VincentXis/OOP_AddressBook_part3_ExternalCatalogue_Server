@@ -1,31 +1,27 @@
 package server;
 
-import database.DatabaseContentManager;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Server {
-    private DatabaseContentManager dcm;
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
+    private String fileName;
 
-    public Server() {
-        dcm = new DatabaseContentManager();
-        startServer();
+    public Server(int portNumber, String fileName) {
+        this.fileName = fileName;
+        startServer(portNumber);
     }
 
-    private void startServer() {
+    private void startServer(int portNumber) {
         try {
-            serverSocket = new ServerSocket(61616);
+            ServerSocket serverSocket = new ServerSocket(portNumber);
             while (true) {
-                clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
                 openStreamsForClientServerCommunication(clientSocket);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -33,6 +29,7 @@ public class Server {
         new Thread(() -> {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+                System.out.println("Client connected: " + clientSocket.getLocalAddress().getHostAddress());
                 clientRequestManagement(in, out);
 
             } catch (Exception e) {
@@ -46,11 +43,22 @@ public class Server {
         while ((clientInputRequest = in.readLine()) != null) {
             System.out.println("Request: " + clientInputRequest);
             if (clientInputRequest.equals("get all")) {
-                dcm.readFromFile(out);
+                readFromFileInDatabase(out);
                 out.println();
             } else if (clientInputRequest.equals("exit")) {
                 break;
             }
+        }
+    }
+
+    private void readFromFileInDatabase(PrintWriter out) {
+        String filePath = "src\\server\\contactDatabase\\";
+        try (Scanner sc = new Scanner(new FileReader(filePath + new File(this.fileName)))) {
+            while (sc.hasNextLine()) {
+                out.println(sc.nextLine().replaceAll(",", " "));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
