@@ -31,13 +31,15 @@ public class Server {
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                 System.out.println("Client connected: " + clientSocket.getLocalAddress().getHostAddress());
                 clientRequestManagement(in, out);
-
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }).start();
     }
 
+    /**
+     * @throws IOException - because the error can be caught where it is supposed to be used.
+     */
     private void clientRequestManagement(BufferedReader in, PrintWriter out) throws IOException {
         String clientInputRequest;
         while ((clientInputRequest = in.readLine()) != null) {
