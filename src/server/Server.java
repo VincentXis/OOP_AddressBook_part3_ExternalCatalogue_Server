@@ -31,6 +31,7 @@ public class Server {
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                 System.out.println("Client connected: " + clientSocket.getLocalAddress().getHostAddress());
                 clientRequestManagement(in, out);
+                System.out.println("Client disconnected");
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
