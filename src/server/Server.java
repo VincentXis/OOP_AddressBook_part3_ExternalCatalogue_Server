@@ -45,7 +45,7 @@ public class Server {
         String clientInputRequest;
         while ((clientInputRequest = in.readLine()) != null) {
             System.out.println("Request: " + clientInputRequest);
-            if (clientInputRequest.equals("get all")) {
+            if (clientInputRequest.equals("getall")) {
                 readFromFileInDatabase(out);
                 out.println();
             } else if (clientInputRequest.equals("exit")) {
