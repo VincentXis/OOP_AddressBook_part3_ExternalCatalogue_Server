@@ -30,7 +30,7 @@ public class Server {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
                 System.out.println("Client connected: " + clientSocket.getLocalAddress().getHostAddress());
-                clientRequestManagement(in, out);
+                readClientRequests(in, out);
                 System.out.println("Client disconnected");
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -41,12 +41,12 @@ public class Server {
     /**
      * @throws IOException - because the error can be caught where it is supposed to be used.
      */
-    private void clientRequestManagement(BufferedReader in, PrintWriter out) throws IOException {
+    private void readClientRequests(BufferedReader in, PrintWriter out) throws IOException {
         String clientInputRequest;
         while ((clientInputRequest = in.readLine()) != null) {
             System.out.println("Request: " + clientInputRequest);
             if (clientInputRequest.equals("getall")) {
-                readFromFileInDatabase(out);
+                readFromFileToClient(out);
                 out.println();
             } else if (clientInputRequest.equals("exit")) {
                 break;
@@ -54,7 +54,7 @@ public class Server {
         }
     }
 
-    private void readFromFileInDatabase(PrintWriter out) {
+    private void readFromFileToClient(PrintWriter out) {
         String filePath = "src\\server\\contactDatabase\\";
         try (Scanner sc = new Scanner(new FileReader(filePath + new File(this.fileName)))) {
             while (sc.hasNextLine()) {
