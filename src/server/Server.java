@@ -15,10 +15,12 @@ public class Server {
 
     private void startServer(int portNumber) {
         try {
-            ServerSocket serverSocket = new ServerSocket(portNumber);
+            ServerSocket serverSocket;
             while (true) {
+                serverSocket = new ServerSocket(portNumber);
                 Socket clientSocket = serverSocket.accept();
                 openStreamsForClientServerCommunication(clientSocket);
+                serverSocket.close();
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -46,7 +48,9 @@ public class Server {
         while ((clientInputRequest = in.readLine()) != null) {
             System.out.println("Request: " + clientInputRequest);
             if (clientInputRequest.equals("getall")) {
-                readFromFileToClient(out);
+
+//                readFromFileToClient(out);
+                readFromFileToClientOneString(out);
                 out.println();
             } else if (clientInputRequest.equals("exit")) {
                 break;
@@ -60,6 +64,18 @@ public class Server {
             while (sc.hasNextLine()) {
                 out.println(sc.nextLine().replaceAll(",", " "));
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void readFromFileToClientOneString(PrintWriter out) {
+        String fileContents = "";
+        String filePath = "src\\server\\contactDatabase\\";
+        try (Scanner sc = new Scanner(new FileReader(filePath + new File(this.fileName)))) {
+            while (sc.hasNextLine()) {
+                fileContents +=sc.nextLine().replaceAll(",", " ") + "\n";
+            }
+            out.println(fileContents);
         } catch (IOException e) {
             e.printStackTrace();
         }
